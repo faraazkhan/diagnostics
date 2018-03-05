@@ -2,8 +2,9 @@ FROM alpine:3.5
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
 ENV HELM_LATEST_VERSION="v2.6.0" \
-    KUBECTL_LATEST_VERSION="v1.7.4" \
+    KUBECTL_LATEST_VERSION="v1.9.3" \
     STRESS_VERSION=1.0.4 \
+    ETCD_VERSION=3.2.14 \
     SHELL=/bin/bash
 
 WORKDIR /usr/src/diagnostics
@@ -24,6 +25,11 @@ RUN apk --update add bash openssh vim git wget ca-certificates nmap nmap-scripts
   && tar -xvf stress-${STRESS_VERSION}.tar.gz \
   && cd stress-${STRESS_VERSION} \
   && ./configure && make && make install \
+  && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
+  && tar zxvf etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
+  && cp etcd-v${ETCD_VERSION}-linux-amd64/etcdctl /usr/bin/etcdctl \
+  && rm -rf etcd-v* \
+  && chmod +x /usr/bin/etcdctl \
   && apk del deps \
   && rm -rf /usr/src/diagnostics/* /var/cache/distfiles/* /var/cache/apk/*
 
