@@ -1,20 +1,21 @@
-FROM alpine:3.5
+FROM python:2.7-alpine
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
 ENV HELM_LATEST_VERSION="v2.6.0" \
     KUBECTL_LATEST_VERSION="v1.9.3" \
     STRESS_VERSION=1.0.4 \
     ETCD_VERSION=3.2.14 \
-    SHELL=/bin/bash
+    SHELL=/bin/bash \
+    TERM=xterm
 
 WORKDIR /usr/src/diagnostics
 
 ADD https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_12/bin/rabbitmqadmin /usr/local/bin/rabbitmqadmin
 
 RUN apk --update add bash openssh vim git wget ca-certificates nmap nmap-scripts curl tcpdump net-tools bind-tools jq nmap-ncat \
-  python groff less mailcap mysql-client postgresql-client \
-  && apk --update -t deps add py-pip g++ make \
-  && pip install --upgrade awscli s3cmd python-magic \
+  groff less mailcap mysql-client postgresql-client \
+  && apk --update -t deps add g++ make \
+  && pip install --upgrade awscli s3cmd python-magic boto3 \
   && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
   && tar -xvf helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
   && mv linux-amd64/helm /usr/local/bin \

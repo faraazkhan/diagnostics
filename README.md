@@ -19,4 +19,5 @@ vim
 Running Instructions
 --
 `docker run -d -p 2200:22 faraazkhan/diagnostics`
+
 `kubectl run -it diagnostics --image faraazkhan/diagnostics -- bash`
