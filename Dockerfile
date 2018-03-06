@@ -1,7 +1,7 @@
 FROM python:2.7-alpine
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
-ENV HELM_LATEST_VERSION="v2.6.0" \
+ENV HELM_LATEST_VERSION="v2.8.1" \
     KUBECTL_LATEST_VERSION="v1.9.3" \
     STRESS_VERSION=1.0.4 \
     ETCD_VERSION=3.2.14 \
