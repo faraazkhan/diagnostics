@@ -134,6 +134,10 @@ cluster_dump(){
     kubectl cluster-info dump > $diagnose_dir/cluster_dump.log
 }
 
+cluster_events(){
+  kubectl get ev > $diagnose_dir/cluster_events.log
+}
+
 core_component() {
     local label="$1"
     mkdir -p $diagnose_dir/cs/$comp/
@@ -177,6 +181,7 @@ pd_collect() {
     docker
     init-node
     cluster_dump
+    cluster_events
     core_component "app=kube-apiserver"
     core_component "component=kube-scheduler"
     core_component "component=kube-controller-manager"
