@@ -1,0 +1,7 @@
+README.md
+Dockerfile
+build*
+*.yaml
+deploy/
+log/
+

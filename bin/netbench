@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+if [[ -z $1 ]]; then
+  echo "No server specified, setting up as a server"
+  iperf3 -s -D --logfile iperf-server.log
+  ip=$(ip -o -4 addr show eth0 scope global | awk '{print $4;}' | cut -d/ -f 1)
+  echo "Use ${ip} as server IP address"
+else
+  server=${1}
+  echo "Benchmarking against server: ${server}"
+  echo "Running TCP bandwidth benchmark using iperf3 against: ${server}"
+  iperf3 -c ${server} -t 2 -i 1 -P 2 -R
+  echo "Running UDP benchmark using iperf3 against: ${server}"
+  iperf3 -c ${server} -u -b 100m
+  echo -n "Running curl request against external URL: google.com"
+  timecurl https://google.com
+  echo "Running latency test ~20 pings against ${server}"
+  ping -c 20 ${server}
+fi
+  if [[ -f /var/run/secrets/kubernetes.io ]]; then
+    echo "Detected as running in a Kubernetes Pod"
+    echo "Running curl request against internal service: kubernetes.svc.default.cluster.local"
+    timecurl -k https://kubernetes:443/healthz/ping
+    echo "Running curl request against internal service using ip: 10.3.0.1"
+    timecurl -k https://10.3.0.1:443/healthz/ping
+  fi
+echo "Running latency test 20 pings against external URL: google.com"
+ping -c 20 google.com
+echo "Running latency test 20 pings against external IP: 8.8.8.8"
+ping -c 20 8.8.8.8

@@ -6,11 +6,14 @@ ENV HELM_LATEST_VERSION="v2.8.1" \
     STRESS_VERSION=1.0.4 \
     ETCD_VERSION=3.2.14 \
     SHELL=/bin/bash \
-    TERM=xterm
+    TERM=xterm \
+    PATH=${PATH}:/usr/src/diagnostics/bin
 
 WORKDIR /usr/src/diagnostics
 
 ADD https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_12/bin/rabbitmqadmin /usr/local/bin/rabbitmqadmin
+
+COPY . .
 
 RUN apk --update --no-cache add bash openssh vim git wget ca-certificates nmap nmap-scripts curl tcpdump net-tools bind-tools jq nmap-ncat iperf3 \
   groff less mailcap mysql-client postgresql-client python2 \
@@ -22,6 +25,7 @@ RUN apk --update --no-cache add bash openssh vim git wget ca-certificates nmap n
   && pip install --upgrade pip \
   && if [[ ! -e /usr/bin/pip ]]; then ln -sf /usr/bin/pip2.7 /usr/bin/pip; fi \
   && pip install --upgrade numpy awscli s3cmd python-magic boto3 \
+  && cd /tmp \
   && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
   && tar -xvf helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
   && mv linux-amd64/helm /usr/local/bin \
@@ -37,6 +41,8 @@ RUN apk --update --no-cache add bash openssh vim git wget ca-certificates nmap n
   && cp etcd-v${ETCD_VERSION}-linux-amd64/etcdctl /usr/bin/etcdctl \
   && rm -rf etcd-v* \
   && chmod +x /usr/bin/etcdctl \
+  && chmod +x -R /usr/src/diagnostics/bin \
   && apk del deps \
-  && rm -rf /usr/src/diagnostics/* /var/cache/distfiles/* /var/cache/apk/*
+  && rm -rf /tmp/* /var/cache/distfiles/* /var/cache/apk/*
 
+EXPOSE 5201

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+curl -w "@/usr/src/diagnostics/bin/curl-format.txt" -o /dev/null -s ${@}

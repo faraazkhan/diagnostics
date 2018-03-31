@@ -1,0 +1,10 @@
+\n
+      time_namelookup(dns):                                                          %{time_namelookup}\n
+      time_connect(start to tcp connect):                                            %{time_connect}\n
+      time_appconnect(ssl/etc handshake):                                            %{time_appconnect}\n
+      time_pretransfer(protocol negotiations):                                       %{time_pretransfer}\n
+      time_redirect(redirection steps, including lookup, connect, pretransfer etc.): %{time_redirect}\n
+      time_starttransfer(pretransfer + result calculation on server):                %{time_starttransfer}\n
+                                                                                     ----------\n
+      time_total:                                                                    %{time_total}\n
+\n
