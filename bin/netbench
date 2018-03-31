@@ -17,7 +17,7 @@ else
   echo "Running latency test ~20 pings against ${server}"
   ping -c 20 ${server}
 fi
-  if [[ -f /var/run/secrets/kubernetes.io ]]; then
+  if [[ -d /var/run/secrets/kubernetes.io ]]; then
     echo "Detected as running in a Kubernetes Pod"
     echo "Running curl request against internal service: kubernetes.svc.default.cluster.local"
     timecurl -k https://kubernetes:443/healthz/ping
