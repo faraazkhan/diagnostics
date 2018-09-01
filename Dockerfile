@@ -1,22 +1,23 @@
 FROM docker:17.12.1-ce
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
-ENV HELM_LATEST_VERSION="v2.8.1" \
-    KUBECTL_LATEST_VERSION="v1.9.6" \
+ENV HELM_LATEST_VERSION="v2.10.0" \
+    KUBECTL_LATEST_VERSION="v1.11.0" \
     STRESS_VERSION=1.0.4 \
-    ETCD_VERSION=3.2.14 \
+    ETCD_VERSION=3.3.9 \
+    RABBIT_VERSION=3_6_12 \
     SHELL=/bin/bash \
     TERM=xterm \
     PATH=${PATH}:/usr/src/diagnostics/bin
 
 WORKDIR /usr/src/diagnostics
 
-ADD https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v3_6_12/bin/rabbitmqadmin /usr/local/bin/rabbitmqadmin
+ADD https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v${RABBIT_VERSION}/bin/rabbitmqadmin /usr/local/bin/rabbitmqadmin
 
 COPY . .
 
 RUN apk --update --no-cache add bash openssh vim git wget ca-certificates nmap nmap-scripts curl tcpdump net-tools bind-tools jq nmap-ncat iperf3 \
-  groff less mailcap mysql-client postgresql-client python2 \
+  groff less mailcap mysql-client postgresql-client python2 busybox-extras \
   && apk --update --no-cache -t deps add g++ linux-headers libc6-compat musl py-setuptools python2-dev build-base make \
   && if [[ ! -e /usr/bin/python ]];        then ln -sf /usr/bin/python2.7 /usr/bin/python; fi \
   && if [[ ! -e /usr/bin/python-config ]]; then ln -sf /usr/bin/python2.7-config /usr/bin/python-config; fi \
