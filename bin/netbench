@@ -18,11 +18,12 @@ else
   ping -c 20 ${server}
 fi
   if [[ -d /var/run/secrets/kubernetes.io ]]; then
-    echo "Detected as running in a Kubernetes Pod"
+    echo "Detected as running in a Kubernetes Pod, assuming appropriate kubectl access"
     echo "Running curl request against internal service: kubernetes.svc.default.cluster.local"
-    timecurl -k https://kubernetes:443/healthz/ping
-    echo "Running curl request against internal service using ip: 10.3.0.1"
-    timecurl -k https://10.3.0.1:443/healthz/ping
+    timecurl -k https://kubernetes.svc.default.cluster.local:443/healthz/ping
+    ip=$(kubectl get svc kubernetes -n default -o json | jq -r .spec.clusterIP)
+    echo "Running curl request against internal service using ip: ${ip}"
+    timecurl -k https://${ip}:443/healthz/ping
   fi
 echo "Running latency test 20 pings against external URL: google.com"
 ping -c 20 google.com
