@@ -1,10 +1,11 @@
 FROM docker:17.12.1-ce
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
-ENV HELM_LATEST_VERSION="v2.10.0" \
-    KUBECTL_LATEST_VERSION="v1.11.0" \
+ENV HELM_LATEST_VERSION="v2.12.0" \
+    KUBECTL_LATEST_VERSION="v1.13.1" \
     STRESS_VERSION=1.0.4 \
-    ETCD_VERSION=3.3.9 \
+    ETCD_VERSION=3.3.10 \
+    ETCDCTL_API=3 \
     RABBIT_VERSION=3_6_12 \
     SHELL=/bin/bash \
     TERM=xterm \
@@ -17,7 +18,7 @@ ADD https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v${R
 COPY . .
 
 RUN apk --update --no-cache add bash openssh vim git wget ca-certificates nmap nmap-scripts curl tcpdump net-tools bind-tools jq nmap-ncat iperf3 \
-  groff less mailcap mysql-client postgresql-client python2 busybox-extras \
+  groff less mailcap mysql-client postgresql-client python2 busybox-extras mtr \
   && apk --update --no-cache -t deps add g++ linux-headers libc6-compat musl py-setuptools python2-dev build-base make \
   && if [[ ! -e /usr/bin/python ]];        then ln -sf /usr/bin/python2.7 /usr/bin/python; fi \
   && if [[ ! -e /usr/bin/python-config ]]; then ln -sf /usr/bin/python2.7-config /usr/bin/python-config; fi \
