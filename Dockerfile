@@ -1,10 +1,10 @@
 FROM docker:18.09.7@sha256:310156c95007d6cca1417d0692786fe4da816b886a08bc7de97edf02cab4db31
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
-ENV HELM_LATEST_VERSION="v2.12.0" \
-    KUBECTL_LATEST_VERSION="v1.13.1" \
+ENV HELM_LATEST_VERSION="v2.14.0" \
+    KUBECTL_LATEST_VERSION="v1.15.0" \
     STRESS_VERSION=1.0.4 \
-    ETCD_VERSION=3.3.10 \
+    ETCD_VERSION=3.3.13 \
     ETCDCTL_API=3 \
     RABBIT_VERSION=3_6_12 \
     SHELL=/bin/bash \
@@ -12,7 +12,7 @@ ENV HELM_LATEST_VERSION="v2.12.0" \
     CALICOCTL_VERSION="v3.5.7" \
     CLOUD_SDK_VERSION=251.0.0 \
     TERM=xterm \
-    PATH=${PATH}:/usr/src/diagnostics/bin
+    PATH=${PATH}:/usr/src/diagnostics/google-cloud-sdk/bin:/usr/src/diagnostics/bin
 
 WORKDIR /usr/src/diagnostics
 
@@ -90,27 +90,24 @@ RUN set -ex \
     && pip install --upgrade numpy awscli s3cmd python-magic boto3 \
     && cd /tmp \
     && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
+    && wget -q http://storage.googleapis.com/kubernetes-release/release/${KUBECTL_LATEST_VERSION}/bin/linux/amd64/kubectl \
+    && wget -q https://people.seas.harvard.edu/~apw/stress/stress-${STRESS_VERSION}.tar.gz \
+    && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
+    && wget -q https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-linux-amd64 -O /usr/local/bin/ctop \
+    && wget -q https://github.com/projectcalico/calicoctl/releases/download/${CALICOCTL_VERSION}/calicoctl && chmod +x calicoctl && mv calicoctl /usr/local/bin \
+    && wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz \
     && tar -xvf helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
     && mv linux-amd64/helm /usr/local/bin \
-    && wget -q http://storage.googleapis.com/kubernetes-release/release/${KUBECTL_LATEST_VERSION}/bin/linux/amd64/kubectl \
     && mv kubectl /usr/local/bin \
-    && chmod +x /usr/local/bin/* \
-    && wget -q https://people.seas.harvard.edu/~apw/stress/stress-${STRESS_VERSION}.tar.gz \
     && tar -xvf stress-${STRESS_VERSION}.tar.gz \
+    && tar zxvf etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
+    && cp etcd-v${ETCD_VERSION}-linux-amd64/etcdctl /usr/local/bin/etcdctl \
+    && tar xzf google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz \
+    && mv google-cloud-sdk /usr/src/diagnostics/ \
     && cd stress-${STRESS_VERSION} \
     && ./configure && make && make install \
-    && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
-    && tar zxvf etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
-    && cp etcd-v${ETCD_VERSION}-linux-amd64/etcdctl /usr/bin/etcdctl \
-    && rm -rf etcd-v* \
-    && chmod +x /usr/bin/etcdctl \
     && chmod +x -R /usr/src/diagnostics/bin \
-    && wget https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-linux-amd64 -O /usr/local/bin/ctop && chmod +x /usr/local/bin/ctop \
-    && wget https://github.com/projectcalico/calicoctl/releases/download/${CALICOCTL_VERSION}/calicoctl && chmod +x calicoctl && mv calicoctl /usr/local/bin \
-    && curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz \
-    && tar xzf google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz \
-    && rm google-cloud-sdk-${CLOUD_SDK_VERSION}-linux-x86_64.tar.gz \
-    && ln -s /lib /lib64 \
+    && chmod +x -R /usr/local/bin \
     && apk del deps \
     && mv /usr/sbin/tcpdump /usr/bin/tcpdump \
     && rm -rf /tmp/* /var/cache/distfiles/* /var/cache/apk/*
