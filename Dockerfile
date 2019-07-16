@@ -116,4 +116,4 @@ RUN set -ex \
     && rm -rf /tmp/* /var/cache/distfiles/* /var/cache/apk/*
 
 EXPOSE 5201
-CMD ["/bin/bash","-l"]
+CMD exec /bin/sh -c "trap : TERM INT; (while true; do sleep 1000; done) & wait"
