@@ -1,0 +1,50 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: diagnostics
+spec:
+  template:
+    metadata:
+      labels:
+        app: diagnostics
+      name: diagnostics
+    spec:
+      serviceAccountName: diagnostics
+      containers:
+      - image: faraazkhan/diagnostics:latest
+        imagePullPolicy: Always
+        securityContext:
+         privileged: true
+        name: diagnostics
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+        volumeMounts:
+          - name: dockersocket
+            mountPath: /var/run/docker.sock
+          - name: procdir
+            mountPath: /host/proc
+            readOnly: true
+          - name: cgroups
+            mountPath: /host/sys/fs/cgroup
+            readOnly: true
+          - name: logs
+            mountPath: /host/var/log
+            readOnly: true
+      volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: dockersocket
+        - hostPath:
+            path: /proc
+          name: procdir
+        - hostPath:
+            path: /sys/fs/cgroup
+          name: cgroups
+        - hostPath:
+           path: /var/log
+          name: logs
