@@ -13,7 +13,7 @@ tcpdump
 git
 kubectl
 helm
-vim
+vim and many more...
 
 
 Running Instructions
