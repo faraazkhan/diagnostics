@@ -1,21 +1,21 @@
-FROM docker:18.09.7@sha256:310156c95007d6cca1417d0692786fe4da816b886a08bc7de97edf02cab4db31
+FROM docker:20.10
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
 
-ENV HELM_LATEST_VERSION="v2.14.0" \
-    KUBECTL_LATEST_VERSION="v1.15.0" \
-    ETCD_VERSION=3.3.13 \
+ENV HELM_LATEST_VERSION="v3.5.3" \
+    KUBECTL_LATEST_VERSION="v1.20.5" \
+    ETCD_VERSION=3.4.13 \
     ETCDCTL_API=3 \
-    RABBIT_VERSION=3_6_12 \
+    RABBIT_VERSION=3.8.14 \
     SHELL=/bin/bash \
-    CTOP_VERSION=0.7.2 \
-    CALICOCTL_VERSION="v3.5.7" \
-    CLOUD_SDK_VERSION=251.0.0 \
+    CTOP_VERSION=0.7.5 \
+    CALICOCTL_VERSION="v3.18.1" \
+    CLOUD_SDK_VERSION=332.0.0 \
     TERM=xterm \
     PATH=${PATH}:/usr/src/diagnostics/google-cloud-sdk/bin:/usr/src/diagnostics/bin
 
 WORKDIR /usr/src/diagnostics
 
-ADD https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/rabbitmq_v${RABBIT_VERSION}/bin/rabbitmqadmin /usr/local/bin/rabbitmqadmin
+ADD "https://github.com/rabbitmq/rabbitmq-server/releases/download/v$RABBIT_VERSION/rabbitmq-server-generic-unix-latest-toolchain-$RABBIT_VERSION.tar.xz" /tmp/rabbitmq.tar.xz
 
 COPY . .
 RUN set -ex \
@@ -67,10 +67,9 @@ RUN set -ex \
       openssh \
       openssl \
       postgresql-client \
-      py-crypto \
-      py-crcmod \
-      py2-virtualenv \
-      python2 \
+      python3 \
+      python3-dev \
+      py3-pip \
       redis \
       scapy \
       socat \
@@ -80,16 +79,11 @@ RUN set -ex \
       util-linux \
       vim \
       wget \
-    && apk --update --no-cache -t deps add g++ linux-headers libc6-compat musl py-setuptools python2-dev build-base make \
-    && if [[ ! -e /usr/bin/python ]];        then ln -sf /usr/bin/python2.7 /usr/bin/python; fi \
-    && if [[ ! -e /usr/bin/python-config ]]; then ln -sf /usr/bin/python2.7-config /usr/bin/python-config; fi \
-    && if [[ ! -e /usr/bin/easy_install ]];  then ln -sf /usr/bin/easy_install-2.7 /usr/bin/easy_install; fi \
-    && easy_install pip \
-    && pip install --upgrade pip \
-    && if [[ ! -e /usr/bin/pip ]]; then ln -sf /usr/bin/pip2.7 /usr/bin/pip; fi \
-    && pip install --upgrade numpy awscli s3cmd python-magic boto3 \
+    && apk --update --no-cache -t deps add tar xz g++ linux-headers libc6-compat musl build-base make \
+    && pip3 install --upgrade pip \
+    && pip3 install --upgrade awscli s3cmd python-magic boto3 \
     && cd /tmp \
-    && wget -q http://storage.googleapis.com/kubernetes-helm/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
+    && wget -q https://get.helm.sh/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
     && wget -q http://storage.googleapis.com/kubernetes-release/release/${KUBECTL_LATEST_VERSION}/bin/linux/amd64/kubectl \
     && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
     && wget -q https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-linux-amd64 -O /usr/local/bin/ctop \
@@ -104,8 +98,8 @@ RUN set -ex \
     && mv google-cloud-sdk /usr/src/diagnostics/ \
     && chmod +x -R /usr/src/diagnostics/bin \
     && chmod +x -R /usr/local/bin \
+    && tar --extract --file /tmp/rabbitmq.tar.xz --strip-components 1 --directory /usr/local/bin/ \
     && apk del deps \
-    && mv /usr/sbin/tcpdump /usr/bin/tcpdump \
     && rm -rf /tmp/* /var/cache/distfiles/* /var/cache/apk/*
 
 EXPOSE 5201
