@@ -116,7 +116,7 @@ RUN set -ex \
     && chmod +x -R /usr/local/bin \
     && tar --extract --file /tmp/rabbitmq.tar.xz --strip-components 1 --directory /usr/local/bin/ \
     && apk del deps \
-    && rm -rf /tmp/* /var/cache/distfiles/* /var/cache/apk/* /usr/src/diagnostics/* /root/.cache
+    && rm -rf /tmp/* /var/cache/distfiles/* /var/cache/apk/* /root/.cache
 RUN chmod -R g=u /root && chown root:root /usr/bin/dumpcap
 
 
