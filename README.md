@@ -21,3 +21,9 @@ Running Instructions
 `docker run -d -p 2200:22 faraazkhan/diagnostics`
 
 `kubectl run -it diagnostics --image faraazkhan/diagnostics -- bash`
+
+Github Packages
+--
+[https://github.com/faraazkhan/diagnostics/pkgs/container/diagnostics][def]
+
+[def]: https://github.com/faraazkhan/diagnostics/pkgs/container/diagnostics
