@@ -102,15 +102,15 @@ RUN set -ex \
     && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
     && wget -q https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-linux-amd64 -O /usr/local/bin/ctop \
     && wget -q https://github.com/projectcalico/calicoctl/releases/download/${CALICOCTL_VERSION}/calicoctl && chmod +x calicoctl && mv calicoctl /usr/local/bin \
-    && wget -q https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_arm64.tar.gz \
+    && wget -q https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
     && wget -q https://github.com/fullstorydev/grpcurl/releases/download/v${GRPC_CURL_VERSION}/grpcurl_${GRPC_CURL_VERSION}_linux_x86_64.tar.gz \
     && tar -xvf helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
     && mv linux-amd64/helm /usr/local/bin \
     && mv kubectl /usr/local/bin \
     && tar zxvf etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
     && cp etcd-v${ETCD_VERSION}-linux-amd64/etcdctl /usr/local/bin/etcdctl \
-    && tar xzf termshark_${TERMSHARK_VERSION}_linux_arm64.tar.gz \
-    && mv termshark_${TERMSHARK_VERSION}_linux_arm64/termshark /usr/local/bin/termshark \
+    && tar xzf termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
+    && mv termshark_${TERMSHARK_VERSION}_linux_x64/termshark /usr/local/bin/termshark \
     && tar xzf grpcurl_${GRPC_CURL_VERSION}_linux_x86_64.tar.gz \
     && mv grpcurl /usr/local/bin/ \
     && chmod +x -R /usr/local/bin \
