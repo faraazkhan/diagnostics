@@ -1,5 +1,8 @@
-FROM docker:cli
+FROM --platform=$TARGETPLATFORM docker:cli
 MAINTAINER Faraaz Khan <faraaz@rationalizeit.us>
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
 ENV HELM_LATEST_VERSION="v3.11.1" \
     KUBECTL_LATEST_VERSION="v1.26.1" \
@@ -20,6 +23,9 @@ ADD "https://github.com/rabbitmq/rabbitmq-server/releases/download/v$RABBIT_VERS
 
 COPY . .
 RUN set -ex \
+    && export ARCHITECTURE=${TARGETPLATFORM##*/} \
+    && export SHORT_86ARCHITECTURE=$(echo $ARCHITECTURE | sed 's/amd64/x64/') \
+    && export LONG_86ARCHITECTURE=$(echo $ARCHITECTURE | sed 's/amd64/x86_64/') \
     && echo "http://nl.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
     && echo "http://nl.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
     && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
@@ -97,21 +103,21 @@ RUN set -ex \
     && pip3 install --upgrade pip \
     && pip3 install --upgrade awscli s3cmd python-magic boto3 \
     && cd /tmp \
-    && wget -q https://get.helm.sh/helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
-    && wget -q http://storage.googleapis.com/kubernetes-release/release/${KUBECTL_LATEST_VERSION}/bin/linux/amd64/kubectl \
-    && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
-    && wget -q https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-linux-amd64 -O /usr/local/bin/ctop \
+    && wget -q https://get.helm.sh/helm-${HELM_LATEST_VERSION}-linux-${ARCHITECTURE}.tar.gz \
+    && wget -q http://storage.googleapis.com/kubernetes-release/release/${KUBECTL_LATEST_VERSION}/bin/linux/${ARCHITECTURE}/kubectl \
+    && wget -q https://github.com/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-${ARCHITECTURE}.tar.gz \
+    && wget -q https://github.com/bcicen/ctop/releases/download/v${CTOP_VERSION}/ctop-${CTOP_VERSION}-linux-${ARCHITECTURE} -O /usr/local/bin/ctop \
     && wget -q https://github.com/projectcalico/calicoctl/releases/download/${CALICOCTL_VERSION}/calicoctl && chmod +x calicoctl && mv calicoctl /usr/local/bin \
-    && wget -q https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
-    && wget -q https://github.com/fullstorydev/grpcurl/releases/download/v${GRPC_CURL_VERSION}/grpcurl_${GRPC_CURL_VERSION}_linux_x86_64.tar.gz \
-    && tar -xvf helm-${HELM_LATEST_VERSION}-linux-amd64.tar.gz \
-    && mv linux-amd64/helm /usr/local/bin \
+    && wget -q https://github.com/gcla/termshark/releases/download/v${TERMSHARK_VERSION}/termshark_${TERMSHARK_VERSION}_linux_${SHORT_86ARCHITECTURE}.tar.gz \
+    && wget -q https://github.com/fullstorydev/grpcurl/releases/download/v${GRPC_CURL_VERSION}/grpcurl_${GRPC_CURL_VERSION}_linux_${LONG_86ARCHITECTURE}.tar.gz \
+    && tar -xvf helm-${HELM_LATEST_VERSION}-linux-${ARCHITECTURE}.tar.gz \
+    && mv linux-${ARCHITECTURE}/helm /usr/local/bin \
     && mv kubectl /usr/local/bin \
-    && tar zxvf etcd-v${ETCD_VERSION}-linux-amd64.tar.gz \
-    && cp etcd-v${ETCD_VERSION}-linux-amd64/etcdctl /usr/local/bin/etcdctl \
-    && tar xzf termshark_${TERMSHARK_VERSION}_linux_x64.tar.gz \
-    && mv termshark_${TERMSHARK_VERSION}_linux_x64/termshark /usr/local/bin/termshark \
-    && tar xzf grpcurl_${GRPC_CURL_VERSION}_linux_x86_64.tar.gz \
+    && tar zxvf etcd-v${ETCD_VERSION}-linux-${ARCHITECTURE}.tar.gz \
+    && cp etcd-v${ETCD_VERSION}-linux-${ARCHITECTURE}/etcdctl /usr/local/bin/etcdctl \
+    && tar xzf termshark_${TERMSHARK_VERSION}_linux_${SHORT_86ARCHITECTURE}.tar.gz \
+    && mv termshark_${TERMSHARK_VERSION}_linux_${SHORT_86ARCHITECTURE}/termshark /usr/local/bin/termshark \
+    && tar xzf grpcurl_${GRPC_CURL_VERSION}_linux_${LONG_86ARCHITECTURE}.tar.gz \
     && mv grpcurl /usr/local/bin/ \
     && chmod +x -R /usr/local/bin \
     && tar --extract --file /tmp/rabbitmq.tar.xz --strip-components 1 --directory /usr/local/bin/ \

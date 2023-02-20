@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-docker build -t faraazkhan/diagnostics .
-docker push faraazkhan/diagnostics
+docker buildx build --platform linux/amd64,linux/arm64 -t faraazkhan/diagnostics:latest --push .
